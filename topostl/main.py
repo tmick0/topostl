@@ -1,5 +1,7 @@
 import argparse
 from .loader import loader
+from .mesh import create_mesh
+from .stl import write_stl
 
 
 def main():
@@ -26,4 +28,9 @@ def main():
     args = parser.parse_args()
 
     l = loader(args.data)
-    l.generate(args.north, args.south, args.west, args.east)
+    alts = l.generate(args.north, args.south, args.west, args.east)
+
+    vertices, triangles = create_mesh(args.north, args.south, args.west, args.east, alts)
+
+    with open(args.output, 'wb') as fh:
+        write_stl(vertices, triangles, fh)
