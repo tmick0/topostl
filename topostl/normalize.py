@@ -4,6 +4,19 @@ from .coords import ECEF, LLA
 import scipy.spatial
 
 
+def normalize_vector(v):
+    return v / np.linalg.norm(v)
+
+
+def get_rotation(A, B):
+    au = normalize_vector(A)
+    bu = normalize_vector(B)
+    R = np.array([[bu[0]*au[0], bu[0]*au[1], bu[0]*au[2]],
+                  [bu[1]*au[0], bu[1]*au[1], bu[1]*au[2]],
+                  [bu[2]*au[0], bu[2]*au[1], bu[2]*au[2]]])
+    return scipy.spatial.transform.Rotation.from_dcm(R)
+
+
 def get_axis(lat0, lon0, alt0, lat1, lon1, alt1):
     v0 = pyproj.transform(LLA, ECEF, lon0, lat0, alt0, radians=False)
     v1 = pyproj.transform(LLA, ECEF, lon1, lat1, alt1, radians=False)
@@ -13,12 +26,11 @@ def get_axis(lat0, lon0, alt0, lat1, lon1, alt1):
 
 def rotate(north, south, west, east, vertices):
     center_lat, center_lon = (north + south) / 2., (east + west) / 2.
-    x = get_axis(south, east, 0., south, west, 0.)
+    x = get_axis(south, west, 0., south, east, 0.)
     y = get_axis(center_lat, center_lon, 0., center_lat, center_lon, 1000.)
-
-    r, _ = scipy.spatial.transform.Rotation.match_vectors(
-        [[0., 0., 1.], [0., 1., 0.]], [x, y])
-
+    r0 = get_rotation(x, [1., 0., 0.])
+    r1 = get_rotation(r0.apply(y), [0., 1., 0.])
+    r = r1 * r0
     return r.apply(vertices)
 
 
