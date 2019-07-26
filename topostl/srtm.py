@@ -24,7 +24,7 @@ def srtm_resolve_coords(lat, lon):
     lat, lon = srtm_get_nominal_coords(lat, lon)
     ns = 'N' if lat >= 0. else 'S'
     ew = 'E' if lon >= 0. else 'W'
-    return "{:s}{:d}{:s}{:d}.hgt".format(ns, abs(lat), ew, abs(lon))
+    return "{:s}{:02d}{:s}{:03d}.hgt".format(ns, abs(lat), ew, abs(lon))
 
 
 def srtm3_load(filename):
