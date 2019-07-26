@@ -15,10 +15,14 @@ class loader (object):
     def generate(self, north, south, west, east):
 
         # first, patch together the set of 1 degree rasters which the bounding box spans
+
+        lat0, lon0 = srtm_get_nominal_coords(north, west)
+        lat1, lon1 = srtm_get_nominal_coords(south, east)
+
         blocks = []
-        for lat in np.arange(north, south, -1):
+        for lat in np.arange(lat0, lat1 - 1, -1):
             row = []
-            for lon in np.arange(west, east, 1):
+            for lon in np.arange(lon0, lon1 + 1, 1):
                 nlat, nlon, data = srtm3_load(os.path.join(
                     self._source_dir, srtm_resolve_coords(lat, lon)))
                 row.append(data[1:, :-1])
