@@ -2,6 +2,7 @@ import argparse
 from .loader import loader
 from .mesh import create_mesh
 from .stl import write_stl
+from .normalize import rotate, center, scale, fill
 
 
 def main():
@@ -29,8 +30,15 @@ def main():
 
     l = loader(args.data)
     alts = l.generate(args.north, args.south, args.west, args.east)
+    rows, cols = alts.shape
 
-    vertices, triangles = create_mesh(args.north, args.south, args.west, args.east, alts)
+    vertices, triangles = create_mesh(
+        args.north, args.south, args.west, args.east, alts)
+
+    vertices = rotate(args.north, args.south, args.west, args.east, vertices)
+    vertices = center(vertices)
+    vertices = scale(vertices, args.scale)
+    vertices, triangles = fill(vertices, triangles, rows, cols, args.base)
 
     with open(args.output, 'wb') as fh:
         write_stl(vertices, triangles, fh)

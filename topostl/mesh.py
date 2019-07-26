@@ -1,8 +1,6 @@
 import pyproj
 import numpy as np
-
-_ECEF = pyproj.Proj(proj='geocent', ellps='WGS84', datum='WGS84')
-_LLA = pyproj.Proj(proj='latlong', ellps='WGS84', datum='WGS84')
+from .coords import ECEF, LLA
 
 
 def generate_triangles(rows, cols):
@@ -26,7 +24,7 @@ def create_mesh(north, south, west, east, raster):
     longrid, latgrid = np.meshgrid(lons, lats)
 
     x, y, z = pyproj.transform(
-        _LLA, _ECEF, longrid, latgrid, raster, radians=False)
+        LLA, ECEF, longrid, latgrid, raster, radians=False)
 
     vertices = np.column_stack((x.flatten(), y.flatten(), z.flatten()))
     triangles = generate_triangles(rows, cols)
