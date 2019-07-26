@@ -8,15 +8,17 @@ def get_axis(lat0, lon0, alt0, lat1, lon1, alt1):
     v0 = pyproj.transform(LLA, ECEF, lon0, lat0, alt0, radians=False)
     v1 = pyproj.transform(LLA, ECEF, lon1, lat1, alt1, radians=False)
     v = np.array(v1) - np.array(v0)
-    return v / np.linalg.norm(v)
+    return v
 
 
 def rotate(north, south, west, east, vertices):
+    center_lat, center_lon = (north + south) / 2., (east + west) / 2.
     x = get_axis(south, east, 0., south, west, 0.)
-    y = get_axis((north + south) / 2, (east + west) / 2, 0.,
-                 (north + south) / 2, (east + west) / 2, 1000.)
+    y = get_axis(center_lat, center_lon, 0., center_lat, center_lon, 1000.)
+
     r, _ = scipy.spatial.transform.Rotation.match_vectors(
-        [[1., 0., 0.], [0., 1., 0.]], [x, y])
+        [[0., 0., 1.], [0., 1., 0.]], [x, y])
+
     return r.apply(vertices)
 
 
