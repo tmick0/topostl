@@ -25,11 +25,14 @@ def main():
                         default=5.0, help="Base thickness (mm)")
     parser.add_argument('-o', '--output', required=True,
                         help="Output STL filename")
+    parser.add_argument('-a', '--exaggerate', type=float,
+                        default=1.0, help="Scaling factor for elevations")
 
     args = parser.parse_args()
 
     l = loader(args.data)
     alts = l.generate(args.north, args.south, args.west, args.east)
+    alts *= args.exaggerate
     rows, cols = alts.shape
 
     vertices, triangles = create_mesh(

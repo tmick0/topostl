@@ -31,4 +31,4 @@ class loader (object):
         rows = int((north - south) * 3600 // 3 + 1)
         cols = int((east - west) * 3600 // 3 + 1)
         res = patch[r0:r0+rows, c0:c0+cols]
-        return res
+        return res.astype(np.float)
